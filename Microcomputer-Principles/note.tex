@@ -1,0 +1,409 @@
+\documentclass[12pt,a4paper,oneside]{ctexart}
+\usepackage{amsmath, amsthm, amssymb, graphicx, float, listings, xcolor}
+%51汇编设置
+\lstdefinelanguage{MCS51}{
+  keywords={MOV, ADD, SUBB, JMP, LCALL, RET, ORL, ANL, XRL, CJNE, DJNZ, INC, DEC, SETB, CLR}, % MCS-51 指令
+  keywordstyle=\color{blue}\bfseries,
+  comment=[l]{;}, % MCS-51 注释
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  basicstyle=\ttfamily\footnotesize,
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+
+%导言区
+\title{课程《微机原理》笔记}
+\author{NH5}
+\date{更新于2025.3.15}
+
+\begin{document}
+\maketitle
+\textbf{本课程基于MCS51芯片}
+
+\section{微机概述}
+\subsection{微处理器}
+计算机与微控制器在控制方面的差别(简答题):
+
+1.PC机在数据处理方面的能力大大超过了微控制器,这是微控制器无法与PC机比拟的.
+因此微控制器就不适合于离线应用场合:控制CAD、建模、仿真、辅助设计、大容量数值处理
+
+2.微控制器主要是针对以对象控制为主,数值处理为辅的小型化、嵌入型控制系统中.
+正因如此,微控制器中的数据存储器RAM往往很小
+
+\subsection{冯$\cdot$诺伊曼结构与哈佛结构}
+存储器结构一般有两种:普林斯顿(Princeton,又称冯$\cdot$诺伊曼结构)结构和哈佛(Harvard)结构.通用微型计
+算机一般采用普林斯顿(Princeton)结构,将程序和数据合用一个存储器空间,在使用时才
+分开;单片机一般采用哈佛(Harvard)结构,将程序和数据分别用不同的存储器存放,各有
+自己的存储空间,分别采用不同的寻址方式.存放程序的存储器称为程序存储器,存放数
+据的存储器称为数据存储器.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/冯诺依曼结构.png}
+    \caption{冯诺依曼结构}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/哈佛结构.png}
+    \caption{哈佛结构}
+\end{figure}
+
+\subsection{指令集}
+计算机可以根据指令集分为:
+精简指令计算机RISC(Reduced InstructionSet Computer)和复杂指令计算机CISC (Complex Instruction Set Computer).
+RISC和CISC是目前设计制造微处理器的两种典型技术.
+
+CISC属于早期传统计算机结构的指令体系,认为指令系统越丰富、越复杂,功能越强大,
+但统计结果表明:使用的80\% 的指令,只占指令系统的20\%,
+同时最频繁的指令是数据传输、算术运算等简单指令.(MCS-51属于这一类)
+
+RISC结构优先选取使用频最高的简单指令,避免复杂指令;
+将指令长度固定,指令格式和寻址方式种类减少;
+以控制逻辑为主,不用或少用微码控制等.
+
+\section{MCS51内部结构}
+MCS51由下列模块构成:
+
+1.中央处理单元CPU(8位):计算+控制的核心单元
+
+2.程序存储器ROM(=硬盘):用于永久性存储应用程序
+
+3.数据存储器RAM(=内存):用于程序运行中存储工作变量和数据
+
+4.并行输入/输出(I/O口):与外界的接口(系统总线、扩展外存、外设接口)
+
+5.串行输入/输出口(UART)(二线):与外界的串行通信
+
+6.定时/计数器:它与CPU之间各自独立工作,当它计数满时向CPU中断
+
+7.时钟电路(fosc):分为内部振荡器、外接振荡电路
+
+8.中断系统:中断源、两级优先,可编程进行控制
+
+9.内部总线:连接上述部件的通道
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/MCS51结构.png}
+\end{figure}
+
+8051微控制器功能模块与特点:
+
+4个8位I/O口:P0、P1、P2、P3,具有第二功能
+
+中断系统:具有5个中断源,2个中断优先权
+
+定时器/计数器:有2个16位的定时器/计数器,具有4种工作方式
+
+串行接口:1个全双工的串行口,用于微控制器与具有串行接口的外设进行异步串行通信,也可以扩展I/O接口
+
+布尔处理器:具有较强的位寻址、位处理能力
+
+时钟电路:产生微控制器工作所需要的时钟脉冲(需要外接晶体振荡器和微调电容)
+
+指令系统:有5大功能,111条指令.为复杂指令系统(CISC)
+
+\subsection{CPU}
+CPU内部结构如下图:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/CPU结构图.png}
+\end{figure}
+\subsubsection{控制器}
+控制器由操作控制部件、时序发生器、指令寄存器IR、指令译码器ID、指令计数器PC等组成
+
+控制器是CPU的大脑中枢,是识别指令,控制计算机各部分工作的部件,
+包括控制取指令、译码和执行三个步骤的全部控制
+
+指令计数器PC:
+
+它是16位的按机器周期自动增1计数器
+
+总指向下一条指令所在首地址(当前PC值)
+
+一切分支/跳转/调用/中断/复位等操作的本质就是:改变PC值
+
+用户不可读写
+
+PC值的范围为0000H$\to$FFFFH,即可寻址范围为64K
+
+存在PC值跳转,会用到栈来存放PC值
+
+\subsubsection{运算器}
+运算器的任务是数据的处理和加工.
+由算术逻辑单元ALU、累加器Acc、暂存寄存器、程序状态寄存器PSW、布尔处理器、BCD码运算调整电路等通过内部总线连接而成
+
+ALU:
+
+完成算术运算及与、或 、非、异或等逻辑操作,
+并通过对运算结果的判断,影响程序状态寄存器PSW相关位的状态
+
+位处理器(布尔处理器):
+
+能直接对位(bit)进行操作,操作空间是位寻址空间.
+位处理器中功能最强、使用最频繁的位是C,也称其为位累加器
+
+暂存寄存器:
+
+用于运算数据的暂时存放,该寄存器不能访问
+
+累加器ACC:
+
+存放操作数与运算结果.
+51中基本上所有与计算有关的操作都要涉及到A(ACC)
+
+以下是一个累加器的操作示例:
+\begin{lstlisting}[language=MCS51]
+    MOV A, 40H ;把地址40H中的数字放入A中
+    ADD A, 41H ;41H中的数字与A中数字相加,结果放入A
+\end{lstlisting}
+
+程序状态字:PSW用于寄存程序运行的状态信息
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/PSW.png}
+\end{figure}
+
+C(PSW.7):进位或借位标志位.
+执行算术运算和逻辑运算指令时,用于记录最高位向前面的进位或借位.
+8位加法运算时,若运算结果的最高位D7位有进位,则C置1,否则C清0.
+8位减法运算时,若被减数比减数小,不够减,需借位,则C置1,否则C清0.
+另外,在51单片机中,该位也可作位运算器,完成各种位处理.
+
+AC(PSW.6):辅助进位或借位标志位.
+用于记录在进行加法和减法运算时,低4位向高4位是否有进位或借位.
+当有进位或借位时,AC置1,否则AC清0
+
+F0(PSW.5),F1(PSW.1):可由用户定义的标志位
+
+RS1、RSO(PSW.4、PSW.3):寄存器组选择位,用软件置1或清0
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    RS1 & RS0 & 工作寄存器组      \\ \hline
+    0   & 0   & 0组(00H-07H) \\ \hline
+    0   & 1   & 1组(08H-0FH) \\ \hline
+    1   & 0   & 2组(10H-17H) \\ \hline
+    1   & 1   & 3组(18H-1FH) \\ \hline
+    \end{tabular}
+\end{table}
+OV(PSW.2):溢出标志位.
+在加法或减法运算时,如运算的结果超出8位二进制数的范围,则OV置1,标志溢出,否则OV清0.
+
+P(PSW.0):偶标志位.
+用于记录指令执行后累加器A中1的个数的奇偶.
+若累加器A中1的个数为奇数,则P置1;
+若累加器A中1的个数为偶数,则P清0
+
+\subsubsection{存储器}
+MCS51微控制器的存储器,ROM和RAM是分开寻址的
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/存储器结构图.png}
+\end{figure}
+
+目前增强型的8051MCU,集成了16-64K的内部ROM,所以已不需外部扩展
+
+内部RAM:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/内部RAM.png}
+\end{figure}
+对于MCS51而言,$80H\to FFH$是特殊功能寄存器区(SFR)
+
+工作寄存器区:
+
+共4组(0,1,2,3),每组都有8个字节(均叫做R0,R1...R7),通过前文提到的RS0,RS1选择某一组
+
+位寻址区:
+
+16个字节,每一位都有地址
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/位寻址区.png}
+\end{figure}
+
+用户RAM区:
+
+$30H\to 7FH$是一般RAM区,也称为用户RAM区,共80字节.常常在此处开辟堆栈
+
+堆栈:
+
+有一个堆栈指针SP指向栈顶.系统复位后$SP=07H$
+
+SFR:
+
+课本以及PPT中有一个超大的表格详细介绍SFR中各个字节的作用,
+这里无法展示,下面介绍部分功能
+
+数据指针DPTR:
+
+DPTR是供用户使用的16bit的寄存器,可以按16位寄存器使用,也可拆分使用.
+DPH (高8位)+DPL(低8位)访问外部数据寄存器时做地址指针用
+
+B寄存器:B
+
+用途:用于乘除运算.
+
+例如要实现40H*41H:
+\begin{lstlisting}[language=MCS51]
+    MOV A,40H
+    MOV B,41H
+    MUL AB ;(低8位->A,高8位->B)
+\end{lstlisting}
+
+ROM:
+
+8051的内部ROM有4k,可以外扩ROM,外部ROM最大可以达到64k
+
+区分内外部ROM是通过$\bar{EA}$引脚区分:$\bar{EA}=1$为内部ROM
+
+通常用DPTR实现对片外数据存储器64KB空间的访问.
+要访问哪个单元,就把相应单元地址放DPTR,
+然后通过 DPTR 寄存器间接寻址进行访问
+
+程序存储器有一些特别区域:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    00H$\to$02H & PC指针复位处     \\ \hline
+    03H$\to$0AH & 外部中断0中断地址区  \\ \hline
+    0BH$\to$12H & 定时器/计数器0中断区 \\ \hline
+    13H$\to$1AH & 外部中断1中断地址区  \\ \hline
+    1BH$\to$22H & 定时器/计数器1中断区 \\ \hline
+    23H$\to$2AH & 串行中断地址区     \\ \hline
+    \end{tabular}
+\end{table}
+
+\section{引脚}
+
+8051共40个引脚:
+
+电源接地2条
+
+时钟电路2条
+
+控制线4条
+
+I/O口$8\times 4 = 32$条
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/8051引脚图.png}
+\end{figure}
+\subsection{电源引脚}
+VCC(Pin40):正电源引脚.正电源接$4.0\to 5.0V$电压,正常工作电压为$+5V$
+
+GND(Pin20):接地引脚
+
+\subsection{时钟引脚}
+XTAL1(Pin19):用作片内振荡电路的输入端
+
+XTAL2(Pin18):用作片内振荡电路的输出端或者外部时钟源的输入引脚
+
+振荡周期:Tc = 晶振频率fosc(或外加频率)的倒数
+
+状态周期:Ts = 2个振荡周期(Tc)(很少用到此概念)
+
+机器周期:Tm = 6个状态周期(Ts) = 12个振荡周期(Tc)
+
+指令周期:Ti:执行一条指令所需的机器周期(Tm)数
+
+1个机器周期 = 12个振荡周期
+
+1个指令周期 = 1、2、4个机器周期
+
+\subsection{控制引脚}
+\subsubsection{复位引脚}
+RST管脚上高电平持续时间大于2个机器周期,使单片机进入某种确定的初始状态:
+
+退出处于节电工作方式的停顿状态、退出一切程序进程、退出程序的死循环,从头开始;
+
+PC值归零(0000H);
+
+各个SFR被赋予初始值:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    特殊功能寄存器 & 初始态       & 特殊功能寄存器 & 初始态       \\ \hline
+    ACC     & 00H       & B       & 00H       \\ \hline
+    PSW     & 00H       & SP      & 07H       \\ \hline
+    DPH     & 00H       & TH0     & 00H       \\ \hline
+    DPL     & 00H       & TL0     & 00H       \\ \hline
+    IP      & xxx00000B & TH1     & 00H       \\ \hline
+    IE      & 0xx00000B & TL1     & 00H       \\ \hline
+    TMOD    & 00H       & TCON    & 00H       \\ \hline
+    SCON    & xxxxxxxxB & SBUF    & 00H       \\ \hline
+    P0-P3   & 11111111B & PCON    & 0xxxxxxxB \\ \hline
+    \end{tabular}
+\end{table}
+堆栈指针SP要额外处理,因为07H是工作寄存器区域
+
+\subsubsection{ALE/PROG}
+ALE/PROG引脚(Pin30)具有两种功能,可以作为地址锁存使能端(Address LatchEnable)和编程脉冲输入端
+
+当作为地址锁存使能端时为ALE.
+当微控制器访问外部存储器时,地址锁存允许信号输出端.有效时输出一个高脉冲.
+ALE(地址锁存)的负跳变将低8位地址打入锁存.以实现P0口的8位数据线和低8位地址线的分时复用和隔离
+
+当微控制器在非访问内部程序存储器时,ALE引脚将有一个1/6振荡频率的正脉冲信号输出,该信号可以用于外部计数或电路其他部分的时钟信号
+
+\subsubsection{PSEN}
+PSEN引脚(Pin29)是微控制器访问外部程序存储器的读选通信号(输出),低电平有效
+
+\subsubsection{EA/VPP}
+EA/VPP引脚(Pin31)具有两种功能,访问内部或外部程序存储器选择信号和提供编程电压
+
+EA:控制访问内外部ROM前文已述,这里不再赘述
+
+VPP:对于片内含有 EPROM 的机型,在编程期间,此引脚用作21V编程电源$V_{pp}$的输入端
+
+\subsection{P0口}
+P0端口具有两个功能,既可以用作双向数据总线口,也可以分时复用输出低8位地址总线
+
+P0做I/O口时必须要接上拉电阻
+
+P0口做普通IO输入时,先拉高再读
+
+\subsection{P1口}
+P1端口一般只用作通用I/O端口
+
+内置了上拉电阻
+
+输出时一切照常,仅在作输入口用时要先对其写1
+
+\subsection{P2口}
+P2端口可以用作8位通用I/O端口,或者在扩展外部存储器时用作高8位地址线
+
+\subsection{P3口}
+P3端口可以用作通用I/O端口,同时还具有特定的第二功能
+
+P3优先作为第二功能使用
+
+P3口作为第二功能使用时,需要先向P3口写入1
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    I/O引脚 & 第二功能引脚名称 & 说明                \\ \hline
+    P3.0  & RXD      & 串行通信的数据接收端口       \\ \hline
+    P3.1  & TXD      & 串行通信的数据发送端口       \\ \hline
+    P3.2  & INT0     & 外部中断0的请求端口        \\ \hline
+    P3.3  & INT1     & 外部中断1的请求端口        \\ \hline
+    P3.4  & T0       & 定时/计数器0的外部事件计数输入端 \\ \hline
+    P3.5  & T1       & 定时/计数器1的外部事件计数输入端 \\ \hline
+    P3.6  & RD       & 外部数据存储单元的写选通信号    \\ \hline
+    P3.7  & WR       & 外部数据存储单元的读选通信号    \\ \hline
+    \end{tabular}
+\end{table}
+
+
+最小系统包括：
+电源,
+时钟电路,
+复位电路,
+$\bar{EA}$管脚设置:有内部rom,则接高电平
+\end{document}

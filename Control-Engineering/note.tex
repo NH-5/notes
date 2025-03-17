@@ -1,0 +1,267 @@
+\documentclass[12pt,a4paper,oneside]{ctexart}
+\usepackage{amsmath, amsthm, amssymb, graphicx, float}
+
+%导言区
+\title{课程《控制工程》笔记}
+\author{NH5}
+\date{更新于2025.3.9}
+
+\begin{document}
+\maketitle
+\section{线性系统的数学描述}
+通过数学模型描述线性系统.常见数学模型有:输入输出描述,状态空间描述,图形化描述
+
+\subsection{线性系统时域数学模型——微分方程}
+\subsubsection{微分方程描述}
+线性定常系统的输入输出关系微分方程标准形式:
+\begin{align*}
+    &c^{(n)}(t) + a_1c^{(n-1)}(t) + ... + a_{n-1}c^{(1)}(t) + a_nc(t)\\
+    = &b_0r^{(m)}(t) + b_1r^{(m-1)}(t) + ... + b_{m-1}r^{(1)}(t) + b_mr(t)
+\end{align*}
+$c(t)$是输出信号,$r(t)$是输入信号
+
+数学模型相同的各种系统成为相似系统,在相似系统中,作用相同的变量称为相似变量.
+
+一种系统的研究可以通过相似系统的概念推广到其他系统中,同样的,可以用一种易实现的系统代替难实现的系统.
+
+有些方程是非线性微分方程,可以通过在平衡点用Talor级数近似的方式转化成线性方程
+
+\subsubsection{单位脉冲响应描述}
+前述方法是通过基于物理规律等的对系统的分析得到方程的方式,如分析电路.
+
+有些情况下,我们对于系统内部结构未知,可以通过测量输入输出的得到一些数据,通过这些数据建立方程
+
+系统是线性定常、零初始条件($t=0$时系统响应及各阶导数为$0$).则有
+\[
+    H:r(t) \to c(t),c(t) = H[r(t)]
+\]
+
+单位脉冲函数:
+\[
+    r(t)=\begin{cases}
+        \frac{A}{\varepsilon}, &0<t<\varepsilon \\
+        0, & t<0,t>\varepsilon
+    \end{cases}
+\]
+当$A=1,\varepsilon \to 0$,称为单位脉冲函数$\delta(t)$
+
+单位脉冲响应:
+
+零初始条件下,LTI系统在$\delta(t)$作用下输出:
+\[
+    g(t) = H[\delta (t)]
+\]
+
+零初始条件下,LTI系统在不同输入信号作用下的输出:
+\begin{align*}
+    A_1\delta (t - \tau_1) + A_2\delta (t - \tau_2)&= A_1g(t - \tau_1) + A_2g(t - \tau_2)\\
+    \sum_{\tau=0}^{\infty}r(\tau)\delta(t-\tau)\varepsilon &= \sum_{\tau=0}^{\infty}r(\tau)g(t-\tau)\varepsilon
+\end{align*}
+
+对于一段连续输入信号有:
+\begin{align*}
+    c(t) &= \int_{0}^{t}g(t-\tau)r(\tau)d\tau\\
+    c(t) &= \int_{0}^{t}g(\tau)r(t-\tau)d\tau
+\end{align*}
+
+\subsection{传递函数}
+\subsubsection{传递函数的定义和性质}
+Laplace变换:
+\[
+    F(s) = L[f(t)] = \int_{0}^{\infty}f(t)e^{-st}dt
+\]
+
+设$C(s)=L[c(t)],R(s)=L[r(t)]$,且满足如下零初始条件:
+\begin{align*}
+    &c(0) = c^{(1)}(0) = ... = c^{(n-1)}(0) = 0\\
+    &r(0) = r^{(1)}(0) = ... = r^{(m-1)}(0) = 0
+\end{align*}
+可得
+\[
+    G(s) = \frac{C(s)}{R(s)} = \frac{\sum_{0}^{m}b_ks^{m-k}}{\sum_{0}^{n}a_ks^{n-k}} = \frac{M(s)}{N(s)}
+\]
+$M(s),N(s)$分别被称为传递函数$G(s)$的分子多项式与分母多项式
+
+传递函数的特征方程是$N(s)=0$,特征根是特征方程的解,
+传递函数零点是$M(s)=0$的解,传递函数的极点是特征根
+
+\subsubsection{几种典型模型}
+一、比例环节/放大环节
+\[
+    c(t)=Kr(t),G(s)=K
+\]
+$K$为增益
+
+特点:输入输出量成比例,无失真和时间延迟
+
+实例:电子放大器,齿轮,电阻(电位器),感应式变送器等
+
+二、惯性环节
+\[
+    Tc'(t) + c(t) = Kr(t),G(s) = \frac{K}{Ts+1}
+\]
+其中为$T$时间常数,$K$为比例系数
+
+特点:含一个独立的储能元件,对突变的输入,其输出不能立即复现,输出无振荡
+
+实例:直流伺服电动机的励磁回路、RC电路
+
+三、纯微分环节
+\[
+    c(t)=Tr'(t),G(s)=Ts
+\]
+
+特点:输出量正比输入量变化的速度,能预示输入信号的变化趋势
+
+实例:实际中没有纯粹的微分环节,它总是与其他环节并存的.
+实际中可实现的微分环节都具有一定的惯性,其传递函数如下
+\[
+    G(s) = \frac{Ts}{Ts+1}
+\]
+
+四、积分环节
+\[
+    c(t)=K\int r(t)dt,G(s)=\frac{K}{s}
+\]
+
+特点:输出量与输入量的积分成正比例,当输入消失,
+输出具有记忆功能;具有明显的滞后作用;可以改善稳态性能
+
+实例:电动机角速度与角度间的传递函数、电容充电、模拟计算机中的积分器等
+
+五、二阶震荡环节
+\begin{align*}
+    &T^2c''(t)+2\zeta Tc'(t)+c(t) = r(t),0\le \zeta <1\\
+    &G(s) = \frac{\omega_n^2}{s^2+2\zeta \omega_ns+\omega_n^2},0\le \zeta <1
+\end{align*}
+其中$\omega_n=\frac{1}{T}$,$\zeta$称为振荡环节的阻尼比,$T$为时间常数,
+为系统的自然振荡角频率(无阻尼自振角频率)
+
+特点:环节中有两个独立的储能元件,可进行能量交换,输出有振荡
+
+实例:RLC电路传递函数,机械弹簧阻尼系统的传递函数
+
+六、纯时延环节
+\[
+    c(t)=r(t-\tau),G(s)=e^{-\tau s}
+\]
+$\tau$称为该环节的延迟时间
+
+特点:输出量能准确复现输入量,但要延迟一固定的时间间隔$\tau$
+
+实例:管道压力、流量等物理量的控制,其数学模型就包含有延迟环节
+
+\subsection{结构图}
+根据不同功能,可将系统划分为若干环节或子系统,每个子系统的功能用一个单向性的函数方块来表示
+
+方块中填写表示这个子系统的传递函数,输入量加到方块上,那么输出量就是传递结果
+
+根据系统中信息的传递方向,将各个子系统的函数方块用信号线顺次连接起来,就构成了系统的结构图,又称系统的方块图
+
+如下图所示
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/结构图原件.png}
+\end{figure}
+
+对于闭环系统,需引入两个新符号,分别称为相加点(比较点、综合点)和分支点(引出点、测量点).
+相加点是系统的比较元件,表示两个以上信号的代数运算.
+箭头指向的信号流线表示它的输入信号,箭头离开它的信号流线表示它的输出信号;
+附近的$+$、$-$号表示信号之间的运算关系是相加还是相减
+
+如下图,相加点如(a),分支点如(b)
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/相加点和分支点.png}
+\end{figure}
+
+\subsubsection{闭环系统结构图}
+一、无扰动作用的闭环系统
+
+基本结构如下图
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/无扰动闭环系统.png}
+\end{figure}
+
+其中$E(s)$,$B(s)$分别为偏差信号和反馈信号的Laplace变换,
+$H(s)$为闭环系统中的反馈传递函数
+
+系统中存在如下关系:
+\begin{align*}
+    C(s)&=G(s)E(s)\\
+    E(s)&=R(s)-B(s)\\
+    B(s)&=H(s)C(s)
+\end{align*}
+
+开环传递函数为反馈信号与偏差信号之比,前向传递函数为输出量和偏差信号之比
+
+如果反馈传递函数等于1,那么开环传递函数和前向传递函数相同,称这时的闭环反馈系统为单位反馈系统
+
+闭环传递函数为系统输出量和输入量之间的关系
+
+易得
+\[
+    C(s)=\frac{G(s)}{1+G(s)H(s)}R(s)
+\]
+
+二、有扰动作用的闭环系统
+如下基本结构
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/有扰动闭环系统.png}
+\end{figure}
+
+系统对扰动$N(s)$的响应$C_N(s)$为
+\[
+    C_N(s)=\frac{G_2(s)}{1+G_1(s)G_2(s)H(s)}N(s)
+\]
+
+系统对参考输入量$R(s)$的响应$C_R(s)$为
+\[
+    C_R(s) = \frac{G_1(s)G_2(s)}{1+G_1(s)G_2(s)H(s)}R(s)
+\]
+
+参考输入量$R(s)$和扰动量$N(s)$同时作用于系统时，系统的响应$C(s)$为
+\[
+    C(s) = C_N(s) + C_R(s) = \frac{G_2(s)}{1+G_1(s)G_2(s)H(s)}\left[G_1(s)R(s)+N(s)\right]
+\]
+
+\subsubsection{结构图的化简}
+串联的简化:传递函数相乘
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/串联简化.png}
+\end{figure}
+
+并联的简化:传递函数加减
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/并联简化.png}
+\end{figure}
+
+反馈回路的简化:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/反馈回路简化.png}
+\end{figure}
+\[
+    G(s)=\frac{C(s)}{R(s)} = \frac{G(s)}{1\pm G(s)H(s)}
+\]
+
+相加点的前后移动:乘法分配律
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/相加点前移.png}
+\end{figure}
+\[
+    C(s)=R(s)G(s)\pm Q(s)=[R(s)\pm \frac{Q(s)}{G(s)}]G(s)
+\]
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/相加点后移.png}
+\end{figure}
+\[
+    C(s)=[R(s)\pm Q(s)]G(s)=R(s)G(s)\pm Q(s)G(s)
+\]
+\end{document}
