@@ -43,4 +43,5 @@ Once you push a tag starting with "v", GitHub Actions will automatically detect 
 * Upload all the compiled PDF files as assets to the release.
 * Automatically generate release notes.
 
-:IMPORTANT: The tag should be unique.
+> [!IMPORTANT]
+> The tag should be unique.
