@@ -1,0 +1,71 @@
+name: Compile Notes and Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  compile_and_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up LaTeX
+        uses: actions/setup-tex@v1
+        with:
+          distribution: texlive
+          packages: |
+            latexmk
+
+      - name: Find note.tex files
+        id: find_notes
+        run: |
+          find . -name "note.tex" -print0 | while IFS= read -r -d $'\0' file; do
+            folder_name=$(dirname "$file")
+            echo "::set-output name=folder_name::$folder_name"
+            echo "::set-output name=file::$file"
+          done
+
+      - name: Compile notes
+        run: |
+          mkdir -p compiled_notes
+          while IFS= read -r -d $'\0' file; do
+            folder_name=$(dirname "$file")
+            base_name=$(basename "$folder_name")
+            latexmk -pdf -output-directory=compiled_notes "$file"
+            mv "compiled_notes/note.pdf" "compiled_notes/${base_name}.pdf"
+          done < <(find . -name "note.tex" -print0)
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            Compiled notes from tag ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: compiled_notes
+          asset_name: compiled_notes.zip
+          asset_content_type: application/zip
+
+      - name: Zip and Upload Individual PDFs
+        run: |
+          cd compiled_notes
+          zip -r individual_notes.zip *.pdf
+          gh release upload ${{ github.ref_name }} individual_notes.zip --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
