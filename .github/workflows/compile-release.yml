@@ -13,10 +13,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Set up TeX Live
+      - name: Set up TeX Live and Chinese fonts
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-full texlive-lang-chinese fonts-noto-cjk
+          sudo apt-get install -y texlive-full texlive-lang-chinese fonts-noto-cjk xfonts-wqy fonts-arphic-*
+          
+          # Create fontset configuration to use system fonts
+          cat > ctex-fontset-custom.def << 'EOF'
+          \setCJKmainfont{Noto Sans CJK SC}
+          \setCJKsansfont{Noto Sans CJK SC}
+          \setCJKmonofont{Noto Sans Mono CJK SC}
+          \setCJKfamilyfont{zhsong}{Noto Serif CJK SC}
+          \setCJKfamilyfont{zhhei}{Noto Sans CJK SC}
+          \setCJKfamilyfont{zhfs}{AR PL UKai CN}
+          \setCJKfamilyfont{zhkai}{AR PL UKai CN}
+          EOF
+          
+          # Install the custom fontset to texmf-local
+          sudo mkdir -p /usr/local/share/texmf/tex/latex/ctex/fontset/
+          sudo cp ctex-fontset-custom.def /usr/local/share/texmf/tex/latex/ctex/fontset/
+          sudo texhash
         
       - name: Find and compile LaTeX files
         id: compile-latex
@@ -34,9 +50,15 @@ jobs:
             # Change to the directory containing the tex file
             cd "$(dirname "$tex_file")"
             
-            # Compile the LaTeX file (using pdflatex, run twice for references)
-            pdflatex -interaction=nonstopmode "note.tex"
-            pdflatex -interaction=nonstopmode "note.tex"
+            # Replace the fontset in the tex file if it uses ctexart
+            if grep -q "ctexart" "note.tex"; then
+              # Add fontset option to document class
+              sed -i 's/\\documentclass\(\[[^]]*\]\)\?{ctexart}/\\documentclass[fontset=custom]{ctexart}/' "note.tex"
+            fi
+            
+            # Compile the LaTeX file (using xelatex for better CJK support)
+            xelatex -interaction=nonstopmode "note.tex"
+            xelatex -interaction=nonstopmode "note.tex"
             
             # Move back to root directory
             cd "$GITHUB_WORKSPACE"
