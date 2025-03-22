@@ -1,7 +1,3 @@
-3.17更新
-
-把各个单独的笔记仓库复制粘贴统一到一个仓库里
-
 ## appendix
 
 ### How To Triger Auto Compile
