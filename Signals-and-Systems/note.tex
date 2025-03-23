@@ -4,7 +4,7 @@
 %导言区
 \title{课程《信号与系统》笔记}
 \author{NH5}
-\date{更新于2025.3.17}
+\date{更新于2025.3.23}
 
 \begin{document}
 \maketitle
@@ -198,5 +198,97 @@
     &\delta'(t)=\frac{d\delta(t)}{dt}\\
     &\delta(t)=\frac{du(t)}{dt}\\
     &u(t)=\frac{r(t)}{dt}
+\end{align*}
+
+\section{连续时间系统的时域分析}
+系统用n阶常微分方程描述,所以系统的性质可以通过方程的解来分析
+
+本课程将解分为两部分:零输入响应和零状态响应,即:
+\[
+    y(t)=y_x(t)+y_f(t)
+\]
+
+\subsection{零输入响应}
+零输入响应:输入信号为零时,仅由系统的初始状态单独作用而产生的响应
+
+\begin{align*}
+    &y^{(n)}(t)+a_{n-1}y^{(n-1)}(t)+...+a_1y^{(1)}(t)+a_0y(t)\\
+    = &b_mf^{(m)}(t)+b_{m-1}f^{(m-1)}(t)+...+b_1f^{(1)}(t)+b_0f(t)
+\end{align*}
+
+上述是系统的微分方程,当输入信号为零时,方程右边为零,方程变为:
+\[
+    y^{(n)}(t)+a_{n-1}y^{(n-1)}(t)+...+a_1y^{(1)}(t)+a_0y(t)=0
+\]
+
+解法参考高数:特征方程求解
+
+根据特征根的特点,解的形式不同:
+
+(1)特征根为若干不等实数$s_1,s_2,...,s_n$:
+\[
+    y_x(t)=\sum_{i=1}^{n}K_ie^{s_i t}
+\]
+
+(2)特征根为若干相等实根$s_1=s_2=...=s_n$:
+\[
+    y_x(t)=\sum_{i=1}^{n}K_it^{i-1}e^{st}
+\]
+
+(3)特征根为若干对共轭复根$s_i=\sigma_i \pm j\omega_i$,如$s_1=1+i,s_2=1-i,s_3=1+2i,s_4=1-2i$为两对:
+\[
+    y_x(t)=\sum_{i=1}^{\frac{n}{2}}e^{\sigma_i t}(K_i\cos \omega_i t+K_i\sin \omega_i t)
+\]
+
+(4)特征根为$k$重共轭复根$s=\sigma \pm j\omega$,如$s_1=s_3=1+i,s_2=s_4=1-i$为两重:
+\[
+    y_x(t)=e^{\sigma t}\left[\left(\sum_{i=1}^{k}C_ix^{i-1}\right)cos \omega t + \left(\sum_{i=1}^{k}D_ix^{i-1}\right)sin\omega t\right]
+\]
+
+得到零输入响应后,可以通过初始条件求解$K_i$
+
+\subsection{零状态响应}
+零状态响应:当系统的初始状态为零时,由系统的外部激励$f(t)$产生的响应称为零状态响应,用$y_f(t)$表示
+
+当系统的激励信号为$\delta(t)$时,系统的零状态响应称为单位冲激响应,用$h(t)$表示
+
+又因为有下列性质:
+\[
+    f(t)=\int_{-\infty}^{\infty}f(\tau)\delta(t-\tau)d\tau
+\]
+
+所以可以得到:
+\[
+    y_f(t)=\int_{-\infty}^{\infty}f(\tau)h(t-\tau)d\tau=f(t)\ast h(t)
+\]
+
+\subsection{冲击响应}
+计算零状态响应需要知道系统的单位冲激响应$h(t)$,这部分介绍计算方法
+
+$h(t)$是LTI系统在初始状态为零时,输入$\delta(t)$得到的输出,所以有:
+\begin{align*}
+    &h^{(n)}(t)+a_{n-1}yh{(n-1)}(t)+...+a_1h^{(1)}(t)+a_0h(t)\\
+    = &b_m\delta^{(m)}(t)+b_{m-1}\delta^{(m-1)}(t)+...+b_1\delta^{(1)}(t)+b_0\delta(t)
+\end{align*}
+
+$t>0^+$时,方程右段为零
+
+当$n>m$时,有:
+\[
+    h(t)=\left(\sum_{i=1}^{n}K_ie^{s_it}\right)u(t)
+\]
+
+当$n \leqslant m$时,有:
+\[
+    h(t)=\left(\sum_{i=1}^{n}K_ie^{s_it}\right)u(t)+\sum_{i=0}^{m-n}A_i\delta^{(i)}(t)
+\]
+
+\subsection{阶跃响应}
+系统在阶跃信号激励下产生的零状态响应称为阶跃响应,用$g(t)$表示
+
+阶跃响应与冲激响应的关系:
+\begin{align*}
+    &g(t)=\int_{-\infty}^{t}h(\tau)d\tau\\
+    &h(t)=\frac{dg(t)}{dt}
 \end{align*}
 \end{document}
