@@ -20,17 +20,26 @@ jobs:
       - name: Set up TeX Live and Chinese fonts
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-full texlive-lang-chinese fonts-noto-cjk xfonts-wqy fonts-arphic-*
+          sudo apt-get install -y texlive-full texlive-lang-chinese fonts-noto-cjk fonts-noto-cjk-extra xfonts-wqy fonts-arphic-*
           
           # Create fontset configuration to use system fonts
           cat > ctex-fontset-custom.def << 'EOF'
-          \setCJKmainfont{Noto Sans CJK SC}
-          \setCJKsansfont{Noto Sans CJK SC}
-          \setCJKmonofont{Noto Sans Mono CJK SC}
-          \setCJKfamilyfont{zhsong}{Noto Serif CJK SC}
-          \setCJKfamilyfont{zhhei}{Noto Sans CJK SC}
-          \setCJKfamilyfont{zhfs}{AR PL UKai CN}
-          \setCJKfamilyfont{zhkai}{AR PL UKai CN}
+          % 将所有字体设置为宋体 Noto Serif CJK SC
+          \setCJKmainfont[BoldFont=Noto Serif CJK SC Bold]{Noto Serif CJK SC}
+          \setCJKsansfont[BoldFont=Noto Serif CJK SC Bold]{Noto Serif CJK SC}
+          \setCJKmonofont{Noto Serif CJK SC}
+          
+          % 中文字体族全部使用宋体
+          \setCJKfamilyfont{zhsong}[BoldFont=Noto Serif CJK SC Bold]{Noto Serif CJK SC}
+          \setCJKfamilyfont{zhhei}{Noto Serif CJK SC}
+          \setCJKfamilyfont{zhfs}{Noto Serif CJK SC}
+          \setCJKfamilyfont{zhkai}{Noto Serif CJK SC}
+          
+          % 字体命令映射
+          \newcommand{\songti}{\CJKfamily{zhsong}}
+          \newcommand{\heiti}{\CJKfamily{zhsong}}
+          \newcommand{\fangsong}{\CJKfamily{zhsong}}
+          \newcommand{\kaishu}{\CJKfamily{zhsong}}
           EOF
           
           # Install the custom fontset to texmf-local
