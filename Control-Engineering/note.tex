@@ -4,7 +4,7 @@
 %导言区
 \title{课程《控制工程》笔记}
 \author{NH5}
-\date{更新于2025.3.22}
+\date{更新于2025.3.29}
 
 \begin{document}
 \maketitle
@@ -379,4 +379,98 @@ $(\bf{E}-\bf{A})^{-1}$可以用下列公式计算
 \[
     (\bf{E}-\bf{A})^{-1} = \frac{(\bf{E}-\bf{A})^*}{det(\bf{E}-\bf{A})}
 \]
+
+以上是梅森公式如何计算,下面是梅森公式的作用
+
+用梅逊公式可以直接求信号流图从输入节点到输出节点的增益,可以用来求传递函数.
+
+\section{线性系统的时域分析}
+\subsection{典型输入信号}
+\subsubsection{阶跃函数}
+\[
+    r(t)=\begin{cases}
+        R\cdot 1(t),&t\geqslant 0\\
+        0,& t<0
+    \end{cases}
+\]
+当$R=1$时称为单位阶跃函数
+
+\subsubsection{斜坡函数}
+斜坡函数又称速度函数
+\[
+    r(t)=\begin{cases}
+        Rt,&t\geqslant 0\\
+        0,&t < 0
+    \end{cases}
+\]
+当$R=1$时,称为单位斜坡函数
+
+\subsubsection{加速度函数}
+\[
+    r(t)=\begin{cases}
+        \frac{Rt^2}{2},&t\geqslant 0\\
+        0,&t < 0
+    \end{cases}
+\]
+当$R=1$时,称为单位加速度函数
+
+\subsubsection{脉冲函数}
+\[
+    r(t)=\begin{cases}
+        \frac{1}{h},&0<t<h\\
+        0,&t\leqslant 0,t\geqslant h
+    \end{cases}
+\]
+称$h$为脉冲宽度,脉冲面积为$1$.若取极限$\lim_{h\to 0}r(t)$,有
+\[
+    \delta(t)=\lim_{h\to 0}r(t)=\begin{cases}
+        \infty,&t=0\\
+        0,&t\neq 0
+    \end{cases}
+\]
+以及
+\[
+    \int_{-\infty}^{+\infty}\delta(t)dt=1
+\]
+称此函数为理想脉冲函数
+
+\subsubsection{正弦函数}
+\[
+    r(t)=A\sin (\omega t)
+\]
+$A$为振幅,$\omega$为角频率
+
+\subsection{动态和稳态}
+以下是一个系统的输出$c(t)$的变化
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/系统动态性能指标.png}
+\end{figure}
+
+可以看到大体可以分为两段:前一段不断变化,起伏较大;后一段起伏较小,大体在某一值附近
+
+前一段我们称之为动态过程;后一段称之为稳态过程
+
+我们需要描述系统的性能,就有一些指标描述,我们分为动态性能与稳态性能描述
+
+\subsubsection{动态性能}
+动态性能指标通常有以下几种(图中有标注):
+
+延迟时间$t_d$:指响应曲线第一次达到稳态值的一半所需的时间.
+
+上升时间$t_{\tau}$:若阶跃响应不超过稳态值,上升时间指响应曲线从稳态值的$10\%$上升到$90\%$所需的时间;
+对于有振荡的系统,上升时间定义为响应从零第一次上升到稳态值所需的时间.上升时间越短,响应速度越快.
+
+峰值时间$t_p$:指阶跃响应曲线超过稳态值,到达第一个峰值所需要的时间.
+
+调节时间$t_s$:在响应曲线的稳态线上,用稳态值的百分数(通常取$5\%$或$2\%$)作一个允许误差范围,响应曲线达到并永远保持在这一允许误差范围内所需的时间.
+
+最大超调量$\sigma_p$:设阶跃响应的最大值为$c(t_p)$,则最大超调量可由下式确定:
+\[
+    \sigma_p = \frac{c(t_p)-c(\infty)}{c(\infty)} \times 100 \%
+\]
+
+振荡次数$N$:在$0\leqslant t\leqslant t_s$内,阶跃响应曲线穿越稳态值$c(\infty)$次数的一半称为振荡次数.
+
+
 \end{document}
