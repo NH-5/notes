@@ -472,5 +472,62 @@ $A$为振幅,$\omega$为角频率
 
 振荡次数$N$:在$0\leqslant t\leqslant t_s$内,阶跃响应曲线穿越稳态值$c(\infty)$次数的一半称为振荡次数.
 
+\subsubsection{稳态性能}
+只有当动态过程收敛时,研究系统的稳态性能才有意义.
+稳态误差是描述系统稳态性能的一种性能指标,
+通常在阶跃函数、斜坡函数或加速度函数作用下进行测定或计算.
+若时间趋于无穷时,系统输出不等于输入量或输入量的确定函数,则系统存在稳态误差.
+稳态误差是系统控制精度或抗扰动能力的一种度量.
 
+\subsection{一阶系统的时域分析}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/一阶系统结构图.png}
+\end{figure}
+一阶系统结构图如图.$T$是系统的时间常数.
+
+回忆:
+\[
+    \mathcal{L}[T] = \frac{1}{Ts}
+\]
+
+下面介绍不同特殊输入的情况
+
+\subsubsection{一阶系统的单位阶跃响应}
+回忆:\[\mathcal{L}[1(t)] = \frac{1}{s}\]
+输入:$r(t)=1(t),R(s)=\frac{1}{s}$,则有输出:
+\[
+    C(s)=\frac{1}{s(Ts+1)}=\frac{1}{s} - \frac{T}{Ts+1}
+\]
+
+作Laplace反变换得到:
+\[
+    c(t)=1-e^{-\frac{t}{T}}(t\geqslant 0)
+\]
+
+\subsubsection{一阶系统的单位脉冲响应}
+回忆:\[\mathcal{L}[\delta(t)]=1\]
+
+输入:$r(t)=\delta(t),R(s)=1$,有输出:
+\[
+    C(s)=\frac{1}{Ts+1}
+\]
+
+作Laplace反变换得到:
+\[
+    c(t)=\frac{1}{T}e^{-\frac{t}{T}}(t\geqslant 0)
+\]
+
+\subsubsection{一阶系统的单位斜坡响应}
+回忆:\[\mathcal{L}[t^m]=\frac{m!}{s^{m+1}}\]
+
+输入:$r(t)=t,R(s)=\frac{1}{s^2}$,有输出:
+\[
+    C(s)=\frac{1}{s^2(Ts+1)}=\frac{1}{s^2}-\frac{T}{s}+\frac{T^2}{Ts+1}
+\]
+
+作Laplace反变换得到:
+\[
+    c(t)=(t-T)+Te^{-\frac{t}{T}}(t\geqslant 0)
+\]
 \end{document}
