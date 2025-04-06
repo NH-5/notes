@@ -1,10 +1,10 @@
 \documentclass[12pt, a4paper, oneside]{ctexart}
-\usepackage{amsmath, amsthm, amssymb, graphicx}
+\usepackage{amsmath, amsthm, amssymb, graphicx, float}
 
 %导言区
 \title{课程《信号与系统》笔记}
 \author{NH5}
-\date{更新于2025.3.23}
+\date{更新于2025.4.6}
 
 \begin{document}
 \maketitle
@@ -148,7 +148,7 @@
 \[
     \int_{-\infty}^{\infty}Sa(t)dt=\pi
 \]
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=8cm]{photos/抽样函数.jpg}
 \end{figure}
@@ -197,7 +197,7 @@
 \begin{align*}
     &\delta'(t)=\frac{d\delta(t)}{dt}\\
     &\delta(t)=\frac{du(t)}{dt}\\
-    &u(t)=\frac{r(t)}{dt}
+    &u(t)=\frac{dr(t)}{dt}
 \end{align*}
 
 \section{连续时间系统的时域分析}
