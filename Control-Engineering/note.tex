@@ -1,5 +1,7 @@
 \documentclass[12pt,a4paper,oneside]{ctexart}
 \usepackage{amsmath, amsthm, amssymb, graphicx, float}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18, clip=false}
 
 %导言区
 \title{课程《控制工程》笔记}
@@ -486,6 +488,12 @@ $A$为振幅,$\omega$为角频率
 \end{figure}
 一阶系统结构图如图.$T$是系统的时间常数.
 
+描述时间常数$T$的一阶系统的微分方程和传递函数如下:
+\begin{align*}
+    &Tc'(t)+c(t)=r(t)\\
+    &G(s)=\frac{C(s)}{R(s)}=\frac{1}{Ts+1}
+\end{align*}
+
 回忆:
 \[
     \mathcal{L}[T] = \frac{1}{Ts}
@@ -530,4 +538,156 @@ $A$为振幅,$\omega$为角频率
 \[
     c(t)=(t-T)+Te^{-\frac{t}{T}}(t\geqslant 0)
 \]
+
+\subsection{二阶系统的时域分析}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/二阶系统结构图.png}
+\end{figure}
+典型二阶系统结构图如上图.系统传递函数如下:
+\[
+    \frac{C(s)}{R(s)}=\frac{K_1K_2}{\tau s^2+s+K_1K_2}
+\]
+
+令$\omega_n^2=\frac{K_1K_2}{\tau}$,$\frac{1}{\tau}=2\zeta \omega_n$,
+可以把二阶系统化为如下标准形式:
+\[
+    \frac{C(s)}{R(s)}=\frac{\omega_n^2}{s^2+2\zeta \omega_n s+\omega_n^2}
+\]
+其中,$\zeta$称为阻尼比,$\omega_n$称为无阻尼自振角频率.
+二阶系统的动态特征可以用这两个参数描述
+
+系统的两个特征根(极点)为:
+\[
+    s_{1,2}=-\zeta \omega_n \pm \omega_n\sqrt{\zeta^2-1}
+\]
+
+随着$\zeta$的变化,特征根也有不同
+
+以下是不同情况的特征根在复平面的分布
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{photos/二阶系统极点分布图.png}
+\end{figure}
+
+\subsubsection{欠阻尼}
+$0<\zeta<1$,特征根为一对共轭复数
+\[
+    s_{1,2}=-\zeta \omega_n \pm j\omega_n\sqrt{1-\zeta^2}
+\]
+
+\subsubsection{临界阻尼}
+$\zeta=1$,特征根为两个相同负实数
+\[
+    s_{1,2}=-\omega_n
+\]
+
+\subsubsection{过阻尼}
+$\zeta>1$,特征根为两个不同实数
+\[
+    s_{1,2}=-\zeta \omega_n \pm \omega_n\sqrt{\zeta^2-1}
+\]
+
+\subsubsection{无阻尼}
+$\zeta=0$,特征根为一对共轭纯虚数
+\[
+    s_{1,2}=\pm j\omega_n
+\]
+\subsection{二阶系统的单位阶跃响应}
+二阶系统在单位阶跃函数作用下输出为:
+\[
+    C(s)=\frac{\omega_n^2}{s^2+2\zeta \omega_n s+\omega_n^2}\cdot \frac{1}{s}=\frac{\omega_n^2}{s(s^2+2\zeta \omega_n s+\omega_n^2)}
+\]
+
+下图是不同阻尼比下的输出曲线
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=12cm,
+            height=8cm,
+            grid=both,
+            minor grid style={line width=.1pt, draw=gray!10},
+            major grid style={line width=.2pt, draw=gray!50},
+            xlabel={$t\omega_n$},
+            ylabel={$c(t)$},
+            ymin=0, ymax=2.0,
+            xmin=0, xmax=15,
+            samples=200,
+            domain=0:15,
+            legend pos=south east,
+            legend style={font=\small},
+            unbounded coords=jump
+        ]
+        
+        % 无阻尼 ζ=0.0
+        \addplot[thick, cyan] {1-cos(deg(x))};
+        
+        % 欠阻尼 ζ=0.1，拆分成多段处理
+        \addplot[thick, blue, domain=0:2] {1-exp(-0.1*x)*(cos(deg(sqrt(1-0.1^2)*x)) + 0.1/sqrt(1-0.1^2)*sin(deg(sqrt(1-0.1^2)*x)))};
+        \addplot[thick, blue, domain=2:8] {1-exp(-0.1*x)*(cos(deg(sqrt(1-0.1^2)*x)) + 0.1/sqrt(1-0.1^2)*sin(deg(sqrt(1-0.1^2)*x)))};
+        \addplot[thick, blue, domain=8:15] {1-exp(-0.1*x)*(cos(deg(sqrt(1-0.1^2)*x)) + 0.1/sqrt(1-0.1^2)*sin(deg(sqrt(1-0.1^2)*x)))};
+        
+        % 欠阻尼 ζ=0.3
+        \addplot[thick, red, domain=0:7] {1-exp(-0.3*x)*(cos(deg(sqrt(1-0.3^2)*x)) + 0.3/sqrt(1-0.3^2)*sin(deg(sqrt(1-0.3^2)*x)))};
+        \addplot[thick, red, domain=7:15] {1-exp(-0.3*x)*(cos(deg(sqrt(1-0.3^2)*x)) + 0.3/sqrt(1-0.3^2)*sin(deg(sqrt(1-0.3^2)*x)))};
+        
+        % 欠阻尼 ζ=0.7
+        \addplot[thick, green!70!black] {1-exp(-0.7*x)*(cos(deg(sqrt(1-0.7^2)*x)) + 0.7/sqrt(1-0.7^2)*sin(deg(sqrt(1-0.7^2)*x)))};
+        
+        % 临界阻尼 ζ=1.0
+        \addplot[thick, purple] {1-exp(-1.0*x)*(1+x)};
+        
+        % 过阻尼 ζ=2.0
+        \addplot[thick, orange] {1-exp(-1.0*x)*(1+x)};
+
+        \legend{$\zeta=0.0$, $\zeta=0.1$, $\zeta=0.3$, $\zeta=0.7$, $\zeta=1.0$, $\zeta=2.0$}
+        
+        % 添加稳态值水平线
+        \addplot[black, dashed] coordinates {(0,1) (15,1)};
+        
+        % 添加参考线 (5% 误差带)
+        \addplot[black, dotted] coordinates {(0,1.05) (15,1.05)};
+        \addplot[black, dotted] coordinates {(0,0.95) (15,0.95)};
+        
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\subsubsection{欠阻尼}
+\begin{align*}
+    C(s) &= \frac{\omega_n^2}{s\left[s^2+2\zeta \omega_n s+\omega_n^2\right]}\\
+    &= \frac{1}{s}-\frac{s+2\zeta \omega_n}{(s+\zeta \omega_n + j\omega_d)(s+\zeta \omega_n - j\omega_d)}\\
+    &= \frac{1}{s}-\frac{s+\zeta \omega_n}{(s+\zeta \omega_n)^2+\omega_d^2}-\frac{\zeta \omega_n}{\omega_d}\cdot \frac{\omega_d}{(s+\zeta \omega_n)^2+\omega_d^2}
+\end{align*}
+其中,$\omega_d=\omega_n\sqrt{1-\zeta^2}$,称为有阻尼振荡频率
+
+作Laplace反变换得到:
+\[
+    c(t)=1-e^{-\zeta \omega_n t}\left[\cos(\omega_d t)+\frac{\zeta}{\sqrt{1-\zeta^2}}\sin(\omega_d t)\right](t\geqslant 0)
+\]
+
+可以写成
+\begin{align*}
+    c(t)&=1-\frac{e^{-\zeta \omega_n t}}{\sqrt{1-\zeta^2}}\left[\sqrt{1-\zeta^2}\cos(\omega_dt)+\zeta\sin(\omega_dt)\right]\\
+    &=1-\frac{e^{-\zeta \omega_n t}}{\sqrt{1-\zeta^2}}\left[\cos(\omega_dt+\varphi)\right]
+\end{align*}
+其中,$\varphi=\arccos(\frac{\sqrt{1-\zeta^2}}{\zeta})$
+
+\subsubsection{无阻尼}
+\[
+    c(t)=1-\cos(\omega_n t)
+\]
+
+\subsubsection{临界阻尼}
+\[
+    c(t)=1-\left(1+\omega_n t\right)e^{-\omega_n t}(t\geqslant 0)
+\]
+
+\subsubsection{过阻尼}
+\[
+    c(t)=1-\frac{1}{2\sqrt{\zeta^2-1}}\left[\frac{e^{-(\zeta-\sqrt{\zeta^2-1})\omega_nt}}{\zeta-\sqrt{\zeta^2-1}} - \frac{e^{-(\zeta+\sqrt{\zeta^2-1})\omega_nt}}{\zeta+\sqrt{\zeta^2-1}}\right](t\geqslant 0)
+\]
+
+在控制工程中,除了不允许产生超调和震荡的情况外,通常希望系统工作在$0.4<\zeta<0.8$的欠阻尼状态
 \end{document}
