@@ -6,7 +6,7 @@
 %导言区
 \title{课程《控制工程》笔记}
 \author{NH5}
-\date{更新于2025.4.6}
+\date{更新于2025.4.7}
 
 \begin{document}
 \maketitle
@@ -690,4 +690,98 @@ $\zeta=0$,特征根为一对共轭纯虚数
 \]
 
 在控制工程中,除了不允许产生超调和震荡的情况外,通常希望系统工作在$0.4<\zeta<0.8$的欠阻尼状态
+
+\subsection{二阶系统的性能指标}
+下面的讨论是基于$0.4<\zeta<0.8$以及假设系统初始条件为零,且基于前一节计算结果
+
+在2.2的部分提出了若干性能指标,这里讨论如何计算这些性能指标
+
+这里不给出计算过程
+
+\subsubsection{上升时间}
+上升时间$t_{\tau}$满足$c(t_{\tau})=1$,可以得到
+\[
+    t_{\tau} = \frac{\pi - \varphi}{\omega_d}
+\]
+
+\subsubsection{峰值时间}
+峰值时间$t_p$满足$\left. \frac{dc(t)}{dt} \right|_{t = t_p} = 0$,可以得到
+\[
+    t_p=\frac{\pi}{\omega_d}
+\]
+
+\subsubsection{最大超调量}
+根据$\sigma_p$的定义,可以得到
+\[
+    \sigma_p=e^{-\frac{\zeta \pi}{\sqrt{1-\zeta^2}}}
+\]
+
+\subsubsection{过渡过程时间}
+$c(t)$夹在一对包络线之间
+\[
+    y(t)=1\pm \frac{e^{-\zeta \omega_n t}}{\sqrt{1-\zeta^2}}
+\]
+所以可以用包络线代替实际曲线来计算$t_s$,只需要引入一个误差$\Delta$来描述代替带来的差别
+
+则有方程
+\[
+    \frac{e^{-\zeta \omega_n t}}{\sqrt{1-\zeta^2}}=\Delta
+\]
+解得
+\[
+    t_s=\frac{1}{\zeta \omega_n}\left(\ln{\frac{1}{\Delta}}+\ln{\frac{1}{\sqrt{1-\zeta^2}}}\right)
+\]
+
+忽略$\ln{\frac{1}{\sqrt{1-\zeta^2}}}(0<\zeta<0.9)$取特定$\Delta$值,有
+\begin{align*}
+    \Delta=5\%,&t_s\approx \frac{3}{\zeta \omega_n}\\
+    \Delta=2\%,&t_s\approx \frac{4}{\zeta \omega_n}
+\end{align*}
+
+\subsubsection{震荡次数}
+根据震荡次数的定义,有
+\[
+    N=\frac{t_s}{2t_p}
+\]
+
+所以有
+\begin{align*}
+    N&=\frac{1.5\sqrt{1-\zeta^2}}{\pi \zeta}(\Delta=5\%)\\
+    N&=\frac{2\sqrt{1-\zeta^2}}{\pi \zeta}(\Delta=2\%)
+\end{align*}
+
+若已知$\sigma_p$,有
+\begin{align*}
+    N&=-\frac{1.5}{\ln{\sigma_p}}(\Delta=5\%)\\
+    N&=-\frac{2}{\ln{\sigma_p}}(\Delta=2\%)
+\end{align*}
+
+\subsection{高阶系统的时域分析}
+设高阶系统的传递函数的一般形式为
+\[
+    \frac{C(s)}{R(s)}=\frac{\sum_{i=0}^{m}b_is^{m-i}}{\sum_{k=0}^{n}a_ks^{n-k}}(n\geqslant m,a_0=1)
+\]
+可以用零点和极点表示这个传递函数
+\[
+    \frac{C(s)}{R(s)}=\frac{K\prod_{i=1}^{m}(s+z_i)}{\prod_{k=1}^{n}(s+p_k)}
+\]
+其中,$-z_i$为系统的零点,$-p_k$为系统的极点,$K$为增益
+
+设零点为不等实数零点,极点为不等极点,既有实数极点,也有复数极点,
+输入为单位阶跃信号
+则系统的响应为
+\[
+    c(t)=\frac{K\prod_{i=1}^{m}(s+z_i)}{s\prod_{j=1}^{q}(s+p_j)\prod_{k=1}^{r}(s^2+2\zeta_k\omega_{nk}s+\omega_{nk}^2)}
+\]
+其中,$q$为实数极点的个数,$r$为复数极点的个数,$n=q+2r$
+
+上式可以展开:
+\[
+    C(s)=\frac{A_0}{s}+\sum_{j=1}^q\frac{A_j}{s+p_j}+\sum_{k=1}^r\frac{B_k(s+\zeta_k\omega_{nk})+C_k\omega_{nk}\sqrt{1-\zeta^2}}{s^2+2\zeta_k\omega_{nk}s+\omega_{nk}^2}
+\]
+
+做Laplace反变换得到
+\[
+    c(t)=A_0+\sum_{j=1}^qA_j e^{-p_j t}+\sum_{k=1}^r\left[B_k e^{-\zeta_k\omega_{nk}t}\cos(\omega_{nk}\sqrt{1-\zeta_k^2}t)+C_k e^{-\zeta_k\omega_{nk}t}\sin(\omega_{nk}\sqrt{1-\zeta_k^2}t)\right]
+\]
 \end{document}
